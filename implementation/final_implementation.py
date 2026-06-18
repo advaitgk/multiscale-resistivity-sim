@@ -11,6 +11,7 @@ Pipeline:
 Author: Advait Karmarkar
 """
 
+import os
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as splinalg
@@ -332,4 +333,11 @@ axs[3].axis('off')
 fig.colorbar(im3, ax=axs[3])
 
 plt.tight_layout()
+
+# Save the figure next to the repo root so it can be embedded in the README.
+os.makedirs("figures", exist_ok=True)
+fig_path = os.path.join("figures", "pipeline_output.png")
+plt.savefig(fig_path, dpi=150, bbox_inches="tight")
+print(f"Saved figure to {fig_path}")
+
 plt.show()

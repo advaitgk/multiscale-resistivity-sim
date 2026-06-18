@@ -36,11 +36,20 @@ The full implementation is a single, self-contained script:
 ## Result
 
 On a 1000×1000 grid (10⁶ nodes), the pipeline produces a planar (2D) effective
-resistivity of ~72 µΩ·cm, which the Bakker 2D→3D correction lifts to a 3D
-estimate of **~53 µΩ·cm** — within the experimentally reported range of
+resistivity of **71.1 µΩ·cm**, which the Bakker 2D→3D correction lifts to a 3D
+estimate of **52.7 µΩ·cm** — within the experimentally reported range of
 35–60 µΩ·cm for near-eutectic Sn-Bi.
 
-![pipeline output](report/) <!-- output figures are shown in report/final_presentation.pdf -->
+![Pipeline output: phase map, impurity distribution, resistivity map, and voltage field](figures/pipeline_output.png)
+
+*From left: the KMC phase microstructure, the trapped-impurity distribution, the
+local resistivity map, and the solved voltage field (effective ρ ≈ 52.7 µΩ·cm).*
+
+> **Reproducibility:** these values are produced by the committed code on the
+> pinned stack in [`requirements.txt`](requirements.txt) and are identical
+> run-to-run. The original project report cites ~72.4 / ~53.2 µΩ·cm from an
+> earlier environment; the small differences come from library versions and the
+> (since-fixed) random seeding of the Monte Carlo stage.
 
 ## Repository structure
 
