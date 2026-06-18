@@ -50,8 +50,15 @@ KMC_STEPS = 50
 KT = 0.65
 J = 1.0
 
+# Master random seed. Seeds BOTH NumPy's interpreter-level RNG (initial melt and
+# diffusion noise) and Numba's independent RNG (the KMC engine), so the entire
+# pipeline is reproducible. Results are bit-identical only within a fixed
+# NumPy/Numba version (pin versions via requirements.txt) but are deterministic
+# run-to-run on a given install.
+SEED = 42
+
 print(f"Initializing {GRID_SIZE}x{GRID_SIZE} random melt...")
-np.random.seed(42)
+np.random.seed(SEED)
 
 # Random liquid initialization (volume fraction based)
 phase_matrix = np.where(
@@ -64,7 +71,13 @@ phase_matrix = np.where(
 # 2. KMC MICROSTRUCTURE GENERATION
 # ==========================================
 @njit
-def run_kmc_growth(matrix, steps, kT, J):
+def run_kmc_growth(matrix, steps, kT, J, seed):
+    # Seed Numba's internal RNG from *inside* the JIT-compiled function.
+    # numpy.random.seed() called in interpreter scope does NOT control Numba's
+    # RNG, so without this line the KMC microstructure (and the final result)
+    # would differ on every run despite the global seed above.
+    np.random.seed(seed)
+
     rows, cols = matrix.shape
     N = rows * cols
 
@@ -117,7 +130,7 @@ def run_kmc_growth(matrix, steps, kT, J):
 
 print(f"Running KMC grain growth ({KMC_STEPS} steps)...")
 start_kmc = time.time()
-phase_matrix = run_kmc_growth(phase_matrix, KMC_STEPS, KT, J)
+phase_matrix = run_kmc_growth(phase_matrix, KMC_STEPS, KT, J, SEED)
 print(f"KMC completed in {time.time() - start_kmc:.2f} s")
 
 # ==========================================
@@ -248,6 +261,8 @@ print("Solving transport equation...")
 start_solve = time.time()
 
 V, info = splinalg.cg(A, b, rtol=1e-8)
+if info != 0:
+    print(f"WARNING: Conjugate Gradient did not converge cleanly (info={info}).")
 
 print(f"Solver completed in {time.time() - start_solve:.2f} s")
 
