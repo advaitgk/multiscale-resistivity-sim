@@ -1,0 +1,8 @@
+# Core scientific stack for the Sn-Bi resistivity simulation.
+# Minimum versions reflect APIs used by the code:
+#   - scipy>=1.12 is required for scipy.sparse.linalg.cg(..., rtol=...)
+# Pin these to the exact versions you ran with for full reproducibility.
+numpy>=1.24
+scipy>=1.12
+numba>=0.59
+matplotlib>=3.7
